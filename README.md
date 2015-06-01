@@ -1,2 +1,2 @@
 # Simulacion-de-Torneo-de-Futbol
-Ignacio Boada, Curso K1092
+Ignacio Boada y Esteban Falasco, Curso K1093
