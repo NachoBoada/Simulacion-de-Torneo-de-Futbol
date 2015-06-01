@@ -1,1 +1,184 @@
+#include<stdio.h>
+#include<string.h>
+#include<stdlib.h>
+#define MAX_EQUIPOS 100
 
+//ESTRUCTURA o Registro
+typedef struct {char identificador[4];// 3 caracteres mas el \0
+                char nombre[32];
+                int potencia_ataque;
+                int potencia_defensa;} t_equipo;
+
+//PROTOTIPOS
+void Menu_principal(t_equipo *equipos, int *c_equipos);
+void Agregar_Equipo(t_equipo *equipos, int *c_equipos);
+void Eliminar_equipo(t_equipo *equipos, int *c_equipos);
+void Ver_Equipos(t_equipo *equipos, int *c_equipos);
+
+//PROGRAMA
+int main()
+{
+    char respuesta;
+    int opcion=1, i, c_equipos=0;
+    t_equipo equipos[MAX_EQUIPOS];
+    FILE* archivo;
+    archivo=fopen("EQUIPOS.BIN", "rb");
+    if(archivo!=NULL)
+    {
+        for(i=0;!feof(archivo); i++)//Leo los equipos que ya están en el archivo
+        {
+             fread(&equipos[i], 1, sizeof(t_equipo), archivo);
+             c_equipos++; // Sirve para llevar la cuenta de equipos, no pueden ser mas de 100.
+        }
+        c_equipos--; //Lee un equipo de mas, no se porque
+        //printf("cantidad de equipos = %d\n",c_equipos );
+        fclose(archivo);
+    }
+    archivo=fopen("EQUIPOS.BIN", "wb+");
+    Menu_principal(equipos, &c_equipos);
+    //printf("cantidad de equipos = %d\n",c_equipos );
+    for(i=0; i<c_equipos; i++)
+    {
+        fwrite(&equipos[i], 1, sizeof(t_equipo), archivo);
+    }
+    fclose(archivo);
+    //system ("Pause");
+    return 0;
+}
+
+
+//FUNCIONES
+void Menu_principal(t_equipo *equipos, int *c_equipos)
+{
+    int opcion;
+    while(opcion!=0)
+    {
+         do{
+            printf("MENU PRINCIPAL\n");
+            printf("1. Agregar Equipo\n2. Eliminar Equipo\n3. Ver Equipos\n0. Salir\n");
+            printf("Elija una opcion\n");
+            scanf("%d", &opcion);
+            fflush(stdin);} while(opcion!=1 && opcion!=2 && opcion!=3 && opcion!=0);
+        switch(opcion)
+        {
+            case 1:
+                Agregar_Equipo(equipos, c_equipos);
+                break;
+            case 2:
+                Eliminar_equipo(equipos, c_equipos);
+                break;
+            case 3:
+                Ver_Equipos(equipos, c_equipos);
+                break;
+            default:
+                break;
+        }
+    }
+    return;
+}
+
+void Agregar_Equipo(t_equipo *equipos, int *c_equipos)
+{
+    t_equipo equipo_nuevo;
+    char respuesta;
+    int i, encontrado=0;
+    if((*c_equipos)>=MAX_EQUIPOS)
+    {
+        printf("Error:Ha alcanzado la cantidad maxima de equipos.\n");
+        return;
+    }
+    printf("ingrese el identificador del equipo\n");
+    scanf("%s", &equipo_nuevo.identificador);
+    fflush(stdin);
+
+    for(i=0; i<*c_equipos && encontrado==0; i++)
+    {
+        if((strcmp(equipos[i].identificador,equipo_nuevo.identificador))==0)
+        {
+            encontrado=1;
+            printf("El equipo ingresado ya existe. Desea modificarlo? S/N\n");
+            scanf("%c", &respuesta);
+            fflush(stdin);
+            if(respuesta=='S')
+            {
+                printf("Ingrese los nuevos datos del equipo:\n");
+                int j, i;
+                for(i=0; i<(*c_equipos) && encontrado==1; i++)
+                {
+                         if((strcmp(equipos[i].identificador,equipo_nuevo.identificador))==0)
+                         {
+                               for(j=i; j<*c_equipos; j++)
+                               {
+                                        equipos[j]=equipos[j+1];
+                                        (*c_equipos)--;
+                               }
+                         }
+                }
+            }
+            else{
+            return;
+            }
+        }
+    }
+        printf("ingrese el nombre del equipo\n");
+        scanf("%s", &equipo_nuevo.nombre);
+        fflush(stdin);
+        do{
+            printf("ingrese la potencia de ataque del equipo\n");
+            scanf("%d", &equipo_nuevo.potencia_ataque);
+            fflush(stdin);
+        }while(equipo_nuevo.potencia_ataque>100 || equipo_nuevo.potencia_ataque<0);
+        do{
+            printf("ingrese la potencia de defensa del equipo\n");
+            scanf("%d", &equipo_nuevo.potencia_defensa);
+            fflush(stdin);
+        }while(equipo_nuevo.potencia_defensa>100 || equipo_nuevo.potencia_defensa<0);
+        equipos[*c_equipos]=equipo_nuevo;
+        (*c_equipos)++;
+
+    return;
+}
+
+
+void Eliminar_equipo(t_equipo *equipos, int *c_equipos)
+{
+    char id_eliminar[4];
+    int encontrado=0, j, i;
+    printf("ingrese el identificador del equipo que desea eliminar\n");
+    scanf("%s", id_eliminar);
+    fflush(stdin);
+    for(i=0; i<(*c_equipos) && encontrado==0; i++)
+    {
+        if((strcmp(equipos[i].identificador,id_eliminar))==0)
+        {
+            encontrado=1;
+            (*c_equipos)--;
+            for(j=i; j<*c_equipos; j++)
+            {
+                equipos[j]=equipos[j+1];
+            }
+            printf("El equipo ha sido eliminado\n");
+        }
+    }
+    if(encontrado==0)
+    {
+        printf("El identificador ingresado no existe\n");
+        return;
+    }
+}
+
+void Ver_Equipos(t_equipo *equipos, int *c_equipos)
+{
+    int i;
+    if(*c_equipos==0)
+    {
+        printf("No hay equipos para mostrar\n");
+        return;
+    }
+    printf("Lista de equipos:\n");
+    printf("id Nombre (ataque - defensa)\n");
+    for(i=0; i<*c_equipos; i++)
+    {
+        printf("%s %s (%d - %d)\n", equipos[i].identificador, equipos[i].nombre, equipos[i].potencia_ataque, equipos[i].potencia_defensa);
+    }
+}
