@@ -1,6 +1,8 @@
 #include<stdio.h>
 #include<string.h>
 #include<stdlib.h>
+#include<string>
+#include<iostream>
 #define MAX_EQUIPOS 100
 
 //ESTRUCTURA o Registro
@@ -51,7 +53,7 @@ int main()
 void Menu_principal(t_equipo *equipos, int *c_equipos)
 {
     int opcion;
-    while(opcion!=0)
+    do
     {
          do{
             printf("MENU PRINCIPAL\n");
@@ -73,13 +75,14 @@ void Menu_principal(t_equipo *equipos, int *c_equipos)
             default:
                 break;
         }
-    }
+    }while(opcion!=0);
     return;
 }
 
 void Agregar_Equipo(t_equipo *equipos, int *c_equipos)
 {
     t_equipo equipo_nuevo;
+    string buffer;
     char respuesta;
     int i, encontrado=0;
     if((*c_equipos)>=MAX_EQUIPOS)
@@ -88,9 +91,9 @@ void Agregar_Equipo(t_equipo *equipos, int *c_equipos)
         return;
     }
     printf("ingrese el identificador del equipo\n");
-    scanf("%s", &equipo_nuevo.identificador);
-    fflush(stdin);
-
+    cin >> buffer;
+    strncpy(equipo_nuevo.identificador, buffer.c_str(), 3);
+    equipo_nuevo.identificador[3] = '\0';
     for(i=0; i<*c_equipos && encontrado==0; i++)
     {
         if((strcmp(equipos[i].identificador,equipo_nuevo.identificador))==0)
@@ -120,9 +123,10 @@ void Agregar_Equipo(t_equipo *equipos, int *c_equipos)
             }
         }
     }
+        string buffer2;
         printf("ingrese el nombre del equipo\n");
-        scanf("%s", &equipo_nuevo.nombre);
-        fflush(stdin);
+        cin>>buffer2;
+        strcpy(equipo_nuevo.nombre, buffer2.c_str());
         do{
             printf("ingrese la potencia de ataque del equipo\n");
             scanf("%d", &equipo_nuevo.potencia_ataque);
@@ -142,11 +146,12 @@ void Agregar_Equipo(t_equipo *equipos, int *c_equipos)
 
 void Eliminar_equipo(t_equipo *equipos, int *c_equipos)
 {
-    char id_eliminar[4];
+    string id_eliminar;
     int encontrado=0, j, i;
     printf("ingrese el identificador del equipo que desea eliminar\n");
-    scanf("%s", id_eliminar);
-    fflush(stdin);
+    cin>>buffer;
+    strncpy(id_eliminar, buffer.c_str(), 3);
+    id_eliminar[3]=\0;
     for(i=0; i<(*c_equipos) && encontrado==0; i++)
     {
         if((strcmp(equipos[i].identificador,id_eliminar))==0)
