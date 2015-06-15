@@ -27,13 +27,7 @@ int main()
     archivo=fopen("EQUIPOS.BIN", "rb");
     if(archivo!=NULL)
     {
-        for(i=0;!feof(archivo); i++)//Leo los equipos que ya están en el archivo
-        {
-             fread(&equipos[i], 1, sizeof(t_equipo), archivo);
-             c_equipos++; // Sirve para llevar la cuenta de equipos, no pueden ser mas de 100.
-        }
-        c_equipos--; //Lee un equipo de mas, no se porque
-        //printf("cantidad de equipos = %d\n",c_equipos );
+        c_equipos = fread(equipos, sizeof(t_equipo), MAX_EQUIPOS, archivo);
         fclose(archivo);
     }
     archivo=fopen("EQUIPOS.BIN", "wb+");
